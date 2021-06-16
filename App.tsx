@@ -1,21 +1,34 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import {
+  createStackNavigator,
+  StackNavigationProp,
+} from "@react-navigation/stack";
+import { NavigationContainer, RouteProp } from "@react-navigation/native";
+import HomeScreen from "./src/screens/HomeScreen";
+import PlayScreen from "./src/screens/PlayScreen";
 
-export default function App() {
+export type StackParams = {
+  Home: undefined;
+  Play: undefined;
+};
+export type StackNavProps<T extends keyof StackParams> = {
+  navigation: StackNavigationProp<StackParams, T>;
+  route: RouteProp<StackParams, T>;
+};
+const Stack = createStackNavigator<StackParams>();
+
+export const Navigator = () => {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Play" component={PlayScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
+};
+export default function App() {
+  return <Navigator />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
