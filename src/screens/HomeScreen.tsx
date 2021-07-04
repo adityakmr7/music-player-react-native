@@ -24,16 +24,21 @@ const HomeScreen = ({ navigation }: StackNavProps<"Home">) => {
       console.log("Ohh No Permissions Granted");
     }
   };
-  const handleNavigation = () => {
+  const handleNavigation = (item: MediaLibrary.Asset) => {
     // TODO:  handle Navigation to play screen
-    navigation.navigate("Play");
+    navigation.navigate("Play", {
+      data: item,
+    });
   };
   return (
     <View style={styles.root}>
       <ScrollView>
         {mediaFile.map((item, i) => {
           return (
-            <TouchableOpacity key={item.id} onPress={handleNavigation}>
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => handleNavigation(item)}
+            >
               <View style={styles.box}>
                 <Text>{item.filename}</Text>
               </View>

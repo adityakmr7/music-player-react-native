@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import * as MediaLibrary from "expo-media-library";
 import {
   createStackNavigator,
   StackNavigationProp,
@@ -11,7 +12,7 @@ import PlayScreen from "./src/screens/PlayScreen";
 
 export type StackParams = {
   Home: undefined;
-  Play: undefined;
+  Play: { data: MediaLibrary.Asset };
 };
 export type StackNavProps<T extends keyof StackParams> = {
   navigation: StackNavigationProp<StackParams, T>;
@@ -22,7 +23,13 @@ const Stack = createStackNavigator<StackParams>();
 export const Navigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            elevation: 0,
+          },
+        }}
+      >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Play" component={PlayScreen} />
       </Stack.Navigator>
