@@ -7,13 +7,13 @@ import { IconButton } from "../component";
 import Slider from "@react-native-community/slider";
 import { StackNavProps } from "../../App";
 import { Audio, AVPlaybackStatus } from "expo-av";
+import { _getDurationSecond, _getMMSSFromMillis } from "../utils/playscreen";
 
 const { width: wWidth } = Dimensions.get("window");
 const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
   const data = route.params;
   const [sound, setSound] = useState<any>();
   const [playing, setPlaying] = useState(false);
-  const [slider, setSlider] = useState({ start: 0, end: 0 });
 
   const [state, setState] = useState({
     isLoaded: true,
@@ -36,60 +36,36 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
   });
 
   const _handlePlay = async () => {
-    const { sound } = await Audio.Sound.createAsync(
+    const { sound, status } = await Audio.Sound.createAsync(
       data.data,
       // initialStatus,
       undefined,
       _handlePlayBackStatus
     );
     setSound(sound);
+    playAndPause(sound);
+    // playBackStatus(status);
+  };
+  const playBackStatus = (status: any) => {
+    setState((prev) => ({
+      ...prev,
+      ...status,
+    }));
+  };
 
-    if (playing) {
-      await sound.pauseAsync();
+  const playAndPause = async (status: any) => {
+    if (state.isPlaying) {
+      await status.pauseAsync();
       setPlaying(false);
     } else {
-      await sound.playAsync();
+      await status.playAsync();
       setPlaying(true);
     }
   };
-
-  const _handlePlayBackStatus = (status: AVPlaybackStatus) => {
-    if (status.isLoaded) {
-      setState((prev) => ({
-        ...prev,
-        ...status,
-      }));
-      _sliderUpdate(status.positionMillis, state.durationMillis);
-    }
-  };
-
-  function _getMMSSFromMillis(millis: number) {
-    const totalSeconds = millis / 1000;
-    const seconds = Math.floor(totalSeconds % 60);
-    const minutes = Math.floor(totalSeconds / 60);
-
-    const padWithZero = (number: any) => {
-      const string = number.toString();
-      if (number < 10) {
-        return "0" + string;
-      }
-      return string;
-    };
-    return padWithZero(minutes) + ":" + padWithZero(seconds);
-  }
-  const _getDurationSecond = (millis: number) => {
-    const totalSeconds = millis / 1000;
-    const seconds = Math.floor(totalSeconds % 60);
-    return seconds;
-  };
-
-  const _sliderUpdate = (duration: any, endDuration: any) => {
-    const start = _getDurationSecond(duration);
-    const end = _getDurationSecond(endDuration);
-    setSlider((prev) => ({
+  const _handlePlayBackStatus = async (status: AVPlaybackStatus) => {
+    setState((prev) => ({
       ...prev,
-      start: start,
-      end: end,
+      ...status,
     }));
   };
 
@@ -102,6 +78,13 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
       : undefined;
   }, [sound]);
   const { isLoaded } = state;
+
+  const _handleMute = () => {
+    if (sound !== "") {
+      sound.setIsMutedAsync(!state.isMuted);
+    }
+  };
+
   return (
     <View style={styles.root}>
       <View style={styles.content}>
@@ -119,8 +102,8 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
           <View>
             <Slider
               style={{ width: wWidth * 0.95, height: 40 }}
-              value={slider.start}
-              maximumValue={slider.end}
+              value={state.positionMillis}
+              maximumValue={state.durationMillis}
               minimumTrackTintColor="grey"
               maximumTrackTintColor="#000000"
             />
@@ -147,6 +130,11 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
               iconName={playing ? "pause" : "play"}
             />
             <IconButton onPress={() => {}} iconName="chevron-right" />
+            <IconButton
+              size={20}
+              onPress={_handleMute}
+              iconName={state.isMuted ? "volume-x" : "volume"}
+            />
           </View>
         </View>
       </View>
