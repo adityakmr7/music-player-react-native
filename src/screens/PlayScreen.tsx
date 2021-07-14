@@ -1,6 +1,5 @@
-import React from "react";
-import { StyleSheet } from "react-native";
-import { View, Text, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, Image } from "react-native";
 import { Feather as Icon } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Dimensions } from "react-native";
@@ -8,20 +7,20 @@ import { IconButton } from "../component";
 import Slider from "@react-native-community/slider";
 import { StackNavProps } from "../../App";
 import { Audio, AVPlaybackStatus } from "expo-av";
-import { useState } from "react";
 
 const { width: wWidth } = Dimensions.get("window");
 const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
   const data = route.params;
   const [sound, setSound] = useState<any>();
   const [playing, setPlaying] = useState(false);
+  const [slider, setSlider] = useState({ start: 0, end: 0 });
 
-  const [state, setState] = useState<AVPlaybackStatus>({
+  const [state, setState] = useState({
     isLoaded: true,
     uri: "",
     progressUpdateIntervalMillis: 0,
-    durationMillis: 0,
-    positionMillis: 0,
+    durationMillis: 0, // start
+    positionMillis: 0, // complete
     playableDurationMillis: 0,
     seekMillisToleranceBefore: 0,
     seekMillisToleranceAfter: 0,
@@ -36,10 +35,10 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
     didJustFinish: false,
   });
 
-  console.log("data", data.data);
   const _handlePlay = async () => {
     const { sound } = await Audio.Sound.createAsync(
       data.data,
+      // initialStatus,
       undefined,
       _handlePlayBackStatus
     );
@@ -55,19 +54,45 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
   };
 
   const _handlePlayBackStatus = (status: AVPlaybackStatus) => {
-    console.log(status);
     if (status.isLoaded) {
       setState((prev) => ({
         ...prev,
         ...status,
       }));
+      _sliderUpdate(status.positionMillis, state.durationMillis);
     }
   };
-  function millisToMinutesAndSeconds(millis: any) {
-    var minutes: number = Math.floor(millis / 60000);
-    var seconds: any = ((millis % 60000) / 1000).toFixed(0);
-    return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+
+  function _getMMSSFromMillis(millis: number) {
+    const totalSeconds = millis / 1000;
+    const seconds = Math.floor(totalSeconds % 60);
+    const minutes = Math.floor(totalSeconds / 60);
+
+    const padWithZero = (number: any) => {
+      const string = number.toString();
+      if (number < 10) {
+        return "0" + string;
+      }
+      return string;
+    };
+    return padWithZero(minutes) + ":" + padWithZero(seconds);
   }
+  const _getDurationSecond = (millis: number) => {
+    const totalSeconds = millis / 1000;
+    const seconds = Math.floor(totalSeconds % 60);
+    return seconds;
+  };
+
+  const _sliderUpdate = (duration: any, endDuration: any) => {
+    const start = _getDurationSecond(duration);
+    const end = _getDurationSecond(endDuration);
+    setSlider((prev) => ({
+      ...prev,
+      start: start,
+      end: end,
+    }));
+  };
+
   React.useEffect(() => {
     return sound
       ? () => {
@@ -94,20 +119,20 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
           <View>
             <Slider
               style={{ width: wWidth * 0.95, height: 40 }}
-              minimumValue={0}
-              maximumValue={1}
+              value={slider.start}
+              maximumValue={slider.end}
               minimumTrackTintColor="grey"
               maximumTrackTintColor="#000000"
             />
             <View style={styles.sliderLabel}>
               <Text>
                 {state.isLoaded
-                  ? millisToMinutesAndSeconds(state.playableDurationMillis)
+                  ? _getMMSSFromMillis(state.positionMillis)
                   : "0:00"}
               </Text>
               <Text>
                 {state.isLoaded
-                  ? millisToMinutesAndSeconds(state.durationMillis)
+                  ? _getMMSSFromMillis(state.durationMillis)
                   : "0:00"}
               </Text>
             </View>
