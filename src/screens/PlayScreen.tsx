@@ -8,8 +8,11 @@ import Slider from "@react-native-community/slider";
 import { StackNavProps } from "../../App";
 import { Audio, AVPlaybackStatus } from "expo-av";
 import { _getDurationSecond, _getMMSSFromMillis } from "../utils/playscreen";
-
+import { globalColor } from "../theme";
 const { width: wWidth } = Dimensions.get("window");
+const BORDER_RADIUS = 20;
+const BACKGROUND_COLOR = globalColor[2];
+const TEXT_COLOR = globalColor[7];
 const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
   const data = route.params;
   const [sound, setSound] = useState<any>();
@@ -95,7 +98,7 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
         <View style={styles.header}>
           <View style={styles.headerContainer}>
             <Image
-              style={{ width: wWidth * 0.8, height: wWidth }}
+              style={styles.image}
               source={{
                 uri: "https://thefader-res.cloudinary.com/private_images/w_760,c_limit,f_auto,q_auto:best/the-weeknd-starboy-no-1_erufgn/the-weeknd-starboy-every-song-charting-hot-100-drake.jpg",
               }}
@@ -109,16 +112,17 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
               style={{ width: wWidth * 0.95, height: 40 }}
               value={state.positionMillis}
               maximumValue={state.durationMillis}
-              minimumTrackTintColor="grey"
-              maximumTrackTintColor="#000000"
+              thumbTintColor={globalColor[3]}
+              minimumTrackTintColor={globalColor[3]}
+              maximumTrackTintColor={globalColor[6]}
             />
             <View style={styles.sliderLabel}>
-              <Text>
+              <Text style={styles.sleekduration}>
                 {state.isLoaded
                   ? _getMMSSFromMillis(state.positionMillis)
                   : "0:00"}
               </Text>
-              <Text>
+              <Text style={styles.sleekduration}>
                 {state.isLoaded
                   ? _getMMSSFromMillis(state.durationMillis)
                   : "0:00"}
@@ -128,19 +132,31 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
         </View>
         <View style={styles.buttonContainer}>
           <View style={styles.btn}>
-            <IconButton onPress={() => {}} iconName="chevron-left" />
             <IconButton
+              buttonType="outline"
+              onPress={() => {}}
+              iconName="chevron-left"
+            />
+            <IconButton
+              buttonType="filled"
               size={60}
               onPress={() => _handlePlay()}
               iconName={playing ? "pause" : "play"}
             />
-            <IconButton onPress={() => {}} iconName="chevron-right" />
             <IconButton
-              size={20}
-              onPress={_handleMute}
-              iconName={state.isMuted ? "volume-x" : "volume"}
+              buttonType="outline"
+              onPress={() => {}}
+              iconName="chevron-right"
             />
           </View>
+        </View>
+        <View style={styles.bottomContainer}>
+          <IconButton
+            buttonType="outline"
+            size={20}
+            onPress={_handleMute}
+            iconName={state.isMuted ? "volume-x" : "volume"}
+          />
         </View>
       </View>
     </View>
@@ -150,7 +166,7 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: BACKGROUND_COLOR,
   },
   content: {
     marginHorizontal: 10,
@@ -161,6 +177,9 @@ const styles = StyleSheet.create({
   },
   sleekContainer: {
     // flex: 1,
+  },
+  sleekduration: {
+    color: TEXT_COLOR,
   },
   buttonContainer: {
     // flex: 1,
@@ -183,6 +202,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 40,
+    borderRadius: BORDER_RADIUS,
+  },
+  image: { width: wWidth * 0.8, height: wWidth, borderRadius: BORDER_RADIUS },
+  bottomContainer: {
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 export default PlayScreen;

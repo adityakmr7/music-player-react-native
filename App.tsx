@@ -9,6 +9,7 @@ import {
 import { NavigationContainer, RouteProp } from "@react-navigation/native";
 import HomeScreen from "./src/screens/HomeScreen";
 import PlayScreen from "./src/screens/PlayScreen";
+import { globalColor } from "./src/theme";
 
 export type StackParams = {
   Home: undefined;
@@ -27,10 +28,19 @@ export const Navigator = () => {
         screenOptions={{
           headerStyle: {
             elevation: 0,
+            backgroundColor: globalColor[2],
           },
+          headerTitleStyle: {
+            color: "#FFFFFF",
+          },
+          headerTintColor: "#ffffff",
         }}
       >
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          options={{ title: "Wapp Player" }}
+          name="Home"
+          component={HomeScreen}
+        />
         <Stack.Screen name="Play" component={PlayScreen} />
       </Stack.Navigator>
     </NavigationContainer>

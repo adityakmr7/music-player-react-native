@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import * as MediaLibrary from "expo-media-library";
 import { StackNavProps } from "../../App";
+import { globalColor } from "../theme";
 
 const HomeScreen = ({ navigation }: StackNavProps<"Home">) => {
   const [mediaFile, setMediaFile] = useState<MediaLibrary.Asset[]>([]);
@@ -40,7 +41,7 @@ const HomeScreen = ({ navigation }: StackNavProps<"Home">) => {
               onPress={() => handleNavigation(item)}
             >
               <View style={styles.box}>
-                <Text>{item.filename}</Text>
+                <Text style={styles.songTitle}>{item.filename}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -53,7 +54,7 @@ const HomeScreen = ({ navigation }: StackNavProps<"Home">) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#ffff",
+    backgroundColor: globalColor[2],
   },
   box: {
     borderBottomWidth: 1,
@@ -61,6 +62,9 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     marginHorizontal: 20,
+  },
+  songTitle: {
+    color: globalColor[7],
   },
 });
 export default HomeScreen;
