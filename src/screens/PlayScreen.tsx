@@ -84,7 +84,11 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
       sound.setIsMutedAsync(!state.isMuted);
     }
   };
-
+  const _handleSeek = async (value: any) => {
+    if (sound !== "") {
+      sound.playFromPositionAsync(value);
+    }
+  };
   return (
     <View style={styles.root}>
       <View style={styles.content}>
@@ -101,6 +105,7 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
         <View style={styles.sleekContainer}>
           <View>
             <Slider
+              onValueChange={_handleSeek}
               style={{ width: wWidth * 0.95, height: 40 }}
               value={state.positionMillis}
               maximumValue={state.durationMillis}
