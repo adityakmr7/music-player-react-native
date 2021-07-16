@@ -49,12 +49,12 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
     playAndPause(sound);
     // playBackStatus(status);
   };
-  const playBackStatus = (status: any) => {
-    setState((prev) => ({
-      ...prev,
-      ...status,
-    }));
-  };
+  // const playBackStatus = (status: any) => {
+  //   setState((prev) => ({
+  //     ...prev,
+  //     ...status,
+  //   }));
+  // };
 
   const playAndPause = async (status: any) => {
     if (state.isPlaying) {
@@ -82,16 +82,17 @@ const PlayScreen = ({ navigation, route }: StackNavProps<"Play">) => {
   }, [sound]);
   const { isLoaded } = state;
 
-  const _handleMute = () => {
+  const _handleMute = async () => {
     if (sound !== "") {
-      sound.setIsMutedAsync(!state.isMuted);
+      await sound.setIsMutedAsync(!state.isMuted);
     }
   };
   const _handleSeek = async (value: any) => {
     if (sound !== "") {
-      sound.playFromPositionAsync(value);
+      await sound.playFromPositionAsync(value);
     }
   };
+
   return (
     <View style={styles.root}>
       <View style={styles.content}>
